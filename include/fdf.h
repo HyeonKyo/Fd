@@ -1,13 +1,19 @@
 #ifndef FDF_H
 # define FDF_H
-#include <unistd.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <math.h>
-#include "mlx.h"
-#include "libft.h"
-#include <stdio.h>
-#define GR 0x0000FF00
+# include <unistd.h>
+# include <stdlib.h>
+# include <fcntl.h>
+# include <math.h>
+# include "mlx.h"
+# include "libft.h"
+# include <stdio.h>
+# define GR 0x0000FF00
+# define RED 0x00FF0000
+# define MLX_X_SIZE 1600
+# define MLX_Y_SIZE 1200
+# define IMG_X_SIZE 800
+# define IMG_Y_SIZE 600
+
 
 typedef struct s_map_len
 {
@@ -38,6 +44,19 @@ typedef struct s_img {
   int endian;
 } t_img;
 
+typedef struct	s_delta
+{
+	double	x;
+	double	y;
+}				t_delta;
+
+typedef struct	s_crd
+{
+	double	x;
+	double	y;
+	double	z;
+}				t_crd;//coordinate
+
 int		get_next_line(int fd, char **line);
 //ft_utils
 void	error(const char *str);
@@ -55,8 +74,10 @@ void	clear_arr(int **arr, t_map_len *map);
 void	clear_str(char **buf, char **line);
 t_data	*create_data(void);
 //iso_vector
-t_data	*rotate_z_axis(t_data *origin, double rad);
+void	rotate_z_axis(t_data *origin, double rad);
 void	rotate_x_axis(t_data *origin, double rad);
-t_data	*make_iso_vector(t_data *origin_data);
+void	make_iso_vector(t_data *origin_data);
+//print_img
+void	multiplied_pixel(t_data *data);
 
 #endif
