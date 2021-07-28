@@ -15,3 +15,18 @@ void	merror(void *ptr)
 		exit(2);
 	}
 }
+
+int		find_max(int a, int b, int c)
+{
+	if (a >= b)
+	{
+		if (a >= c)
+			return (a);
+	}
+	else
+	{
+		if (b >= c)
+			return (b);
+	}
+	return (c);
+}

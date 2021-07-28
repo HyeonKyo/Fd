@@ -8,7 +8,7 @@ void	my_mlx_pixel_put(t_img *img, int x, int y, int color)
 	*(unsigned int *)dst = color;
 }
 
-void	multiplied_pixel(t_data *data)
+void	multiplied_pixel(t_map *data)
 {
 	int	mul_x;
 	int	mul_y;
@@ -17,7 +17,7 @@ void	multiplied_pixel(t_data *data)
 
 	mul_x = IMG_X_SIZE / (data->map->x);
 	mul_y = IMG_Y_SIZE / (data->map->y);
-	mul_z = (mul_x + mul_y) / 2;
+	mul_z = (mul_x + mul_y) / 1000;
 	i = 0;
 	while (i < data->size)
 	{
@@ -120,7 +120,7 @@ void	bresenham(t_vector start, t_vector end, t_img *img)
 		based_y(start, end, &diff, img);
 }
 
-void	print_pixel_in_vector(t_img *img, t_data *data)
+void	print_pixel_in_vector(t_img *img, t_map *data)
 {
 	/*
 	1. iso_data에 mul_x, mul_y를 곱해주기
@@ -158,7 +158,7 @@ void	print_pixel_in_vector(t_img *img, t_data *data)
 	}
 }
 
-void	print_map(t_data *iso_data)
+void	print_map(t_map *iso_data)
 {
 	void *mlx;
 	void *mlx_win;
@@ -175,8 +175,8 @@ void	print_map(t_data *iso_data)
 
 int	main(int ac, char **av)
 {
-	t_data	*origin_data;
-	t_data	*iso_data;
+	t_map	*origin_data;
+	t_map	*iso_data;
 
 	origin_data = parsing_map(ac, av);
 	make_iso_vector(origin_data);

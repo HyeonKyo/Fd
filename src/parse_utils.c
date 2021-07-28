@@ -23,13 +23,13 @@ void	clear_str(char **buf, char **line)
 	*line = 0;
 }
 
-t_data	*create_data(void)
+t_map	*create_data(void)
 {
-	t_data	*data;
+	t_map	*data;
 
-	data = (t_data *)malloc(sizeof(t_data));
+	data = (t_map *)malloc(sizeof(t_map));
 	merror(data);
-	ft_memset(data, 0, sizeof(t_data));
+	ft_memset(data, 0, sizeof(t_map));
 	data->map = (t_map_len *)malloc(sizeof(t_map_len));
 	merror(data->map);
 	ft_memset(data->map, 0, sizeof(t_map_len));

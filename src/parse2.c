@@ -27,12 +27,12 @@ t_vector	*make_vector(int **arr, t_map_len *map)
 	return (vec);
 }
 
-t_data *parsing_map(int ac, char **av)
+t_map *parsing_map(int ac, char **av)
 {
 	int		fd;
 	char	*line;
 	int		**arr;
-	t_data	*data;
+	t_map	*data;
 
 	line = 0;
 	data = create_data();

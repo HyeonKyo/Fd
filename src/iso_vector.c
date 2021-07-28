@@ -1,101 +1,72 @@
 #include "fdf.h"
 
-t_data	*rotate_axis(t_data *origin, double rad)
+void	camera_eye(t_crd *eye, t_map *data)
 {
-	size_t	i;
-	t_data	*new;
-	t_vector	*vec;
+	int	max;
+
+	max = find_max(data->map->x, data->map->y, data->map->z);
+	max++;
+	eye->x = max;
+	eye->y = max;
+	eye->z = max;
+}
+
+t_crd	make_u_vector(t_crd eye)
+{
+	t_crd	origin;
+	t_crd	size;
+
+	ft_memset(&origin, 0, sizeof(t_crd));
+	size.x = 1 / distance_crd(origin, eye);
+	size.y = size.x;
+	size.z = size.x;
+	scail_vector(&eye, size);
+	return (eye);
+}
+
+t_crd	make_v_vector(t_crd eye)
+{
 	t_crd	crd;
+	t_crd	up;
+	t_crd	size;
 
-	new = create_data();
-	ft_memcpy(new, origin, sizeof(t_data));
-	vec = new->vec;
-	i = 0;
-	while (i < new->size)
-	{
-		crd.x = vec[i].x -50;
-		crd.y = vec[i].y -50;
-		crd.z = vec[i].z -50;
-		vec[i].x = crd.x * cos(rad) + crd.y * sin(rad);
-		vec[i].y = cos(rad) * sin(rad) * crd.y - sin(rad) * sin(rad) * crd.x - cos(rad) * crd.z;
-		vec[i].z = cos(rad) * cos(rad) * crd.y - sin(rad) * cos(rad) * crd.x + sin(rad) * crd.z;
-		i++;
-	}
-	return (new);
+	up.x = -1;
+	up.y = -1;
+	up.z = 2 * sqrt(2);
+	size.x = 1 / distance_crd(up, eye);
+	size.y = size.x;
+	size.z = size.x;
+	scail_vector(&eye, size);
+	crd = cross_vector(up, eye);
+	scail_vector(&crd, size);
+	return (crd);
 }
 
-void	translation(t_data *origin)
+void	make_n_vector(t_unit *unit)
 {
-	size_t	i;
-	t_vector	*vec;
-
-	vec = origin->vec;
-	i = 0;
-	while (i < origin->size)
-	{
-		vec[i].x -= origin->map->x / 2 - 0.5;
-		vec[i].y -= origin->map->y / 2 - 0.5;
-		i++;
-	}
+	unit->n = cross_vector(unit->n, unit->u);
 }
 
-void	retranslation(t_data *data)
+void	make_camera_unit(t_crd eye, t_unit *unit)
 {
-	size_t	i;
-	t_vector	*vec;
-	t_map_len	*map;
+	t_crd	*n;
 
-	vec = data->vec;
-	map = data->map;
-	i = 0;
-	while (i < data->size)
-	{
-		vec[i].x += (map->x / 2 - 0.5) * 1.5;
-		vec[i].y += (map->y / 2 - 0.5) * 1.5;
-		i++;
-	}
+	unit->u = make_u_vector(eye);
+	unit->v = make_v_vector(eye);
+	make_n_vector(unit);
 }
 
-void	rotate_z_axis(t_data *origin, double rad)
+void	make_iso_vector(t_map *origin_data)
 {
-	size_t	i;
-	t_vector	*vec;
-	t_crd	crd;
-
-	vec = origin->vec;
-	i = 0;
-	while (i < origin->size)
-	{
-		crd.x = vec[i].x;
-		crd.y = vec[i].y;
-		vec[i].x = crd.x * cos(rad) + crd.y * sin(rad);
-		vec[i].y = crd.y * sin(rad) - crd.x * sin(rad);
-		i++;
-	}
-}
-
-void	rotate_x_axis(t_data *origin, double rad)
-{
-	size_t	i;
-	t_vector	*vec;
-	t_crd	crd;
-
-	vec = origin->vec;
-	i = 0;
-	while (i < origin->size)
-	{
-		crd.y = vec[i].y;
-		crd.z = vec[i].z;
-		vec[i].y = cos(rad) * crd.y + sin(rad) * crd.z;
-		vec[i].z = cos(rad) * crd.z - sin(rad) * crd.y;
-		i++;
-	}
-}
-
-void	make_iso_vector(t_data *origin_data)
-{
-	translation(origin_data);
-	rotate_z_axis(origin_data, M_PI_4);
-	rotate_x_axis(origin_data, M_PI_4);
-	retranslation(origin_data);
+	t_crd	eye;
+	t_unit	unit;
+	/*
+	1. 카메라 eye포인트 찾기
+	camera_eye(&eye, origin_data);
+	2. eye와 at(원점)으로 단위벡터 만들기
+	camera_unit(eye, &unit);
+	3. eye만큼 data translation
+	4. unit벡터만큼 rotate
+	change_view(eye, unit, origin_data);
+	*/
 }

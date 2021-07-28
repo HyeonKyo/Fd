@@ -19,6 +19,7 @@ typedef struct s_map_len
 {
 	int	x;
 	int	y;
+	int	z;
 }				t_map_len;
 
 
@@ -29,19 +30,19 @@ typedef struct	s_vector
 	double	z;
 }				t_vector;
 
-typedef struct	s_data
+typedef struct	s_map
 {
 	size_t		size;
 	t_map_len	*map;
 	t_vector	*vec;
-}				t_data;
+}				t_map;
 
 typedef struct s_img {
-  void *img;
-  char *addr;
-  int bits_per_pixel;
-  int line_length;
-  int endian;
+	void *img;
+	char *addr;
+	int bits_per_pixel;
+	int line_length;
+	int endian;
 } t_img;
 
 typedef struct	s_delta
@@ -57,10 +58,19 @@ typedef struct	s_crd
 	double	z;
 }				t_crd;//coordinate
 
+typedef struct	s_unit
+{
+	t_crd	u;
+	t_crd	v;
+	t_crd	n;
+}				t_unit;//unit vector
+
+
 int		get_next_line(int fd, char **line);
 //ft_utils
 void	error(const char *str);
 void	merror(void *ptr);
+int		find_max(int a, int b, int c);
 
 //parse
 int		check_input(int ac, char **av);
@@ -68,16 +78,23 @@ void	expand_arr(int ***arr, t_map_len *map);
 void	fill_value(int **arr, char **buf, t_map_len *map);
 int		**save_vector(int fd, t_map_len *map);
 t_vector	*make_vector(int **arr, t_map_len *map);
-t_data *parsing_map(int ac, char **av);
+t_map *parsing_map(int ac, char **av);
 //parse_utils
 void	clear_arr(int **arr, t_map_len *map);
 void	clear_str(char **buf, char **line);
-t_data	*create_data(void);
+t_map	*create_data(void);
+//vector
+void	scail_vector(t_crd *crd, t_crd scail);
+double	distance_crd(t_crd c1, t_crd c2);
+void	rotate_unit_vector(t_unit new, t_crd *data);
+t_crd	cross_vector(t_crd v1, t_crd v2);
+
+
 //iso_vector
-void	rotate_z_axis(t_data *origin, double rad);
-void	rotate_x_axis(t_data *origin, double rad);
-void	make_iso_vector(t_data *origin_data);
+void	rotate_z_axis(t_map *origin, double rad);
+void	rotate_x_axis(t_map *origin, double rad);
+void	make_iso_vector(t_map *origin_data);
 //print_img
-void	multiplied_pixel(t_data *data);
+void	multiplied_pixel(t_map *data);
 
 #endif
