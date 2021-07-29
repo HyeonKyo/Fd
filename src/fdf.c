@@ -8,35 +8,41 @@ void	my_mlx_pixel_put(t_img *img, int x, int y, int color)
 	*(unsigned int *)dst = color;
 }
 
-void	multiplied_pixel(t_map *data)
+t_2d_crd	*multiplied_pixel(t_map *data)
 {
-	int	mul_x;
-	int	mul_y;
-	int	mul_z;
+	t_2d_crd	*crd2;
+	t_2d_crd	mul;
 	size_t	i;
-
-	mul_x = IMG_X_SIZE / (data->map->x);
-	mul_y = IMG_Y_SIZE / (data->map->y);
-	mul_z = (mul_x + mul_y) / 1000;
+	printf("before\n");
+	for (int i = 0; i < data->size; i++)
+	{
+		printf("(%.1f %.1f %.1f) ", data->crd[i].x, data->crd[i].y, data->crd[i].z);
+		if (i % data->map->x == data->map->x - 1)
+			printf("\n");
+	}
+	mul.x = IMG_X_SIZE / (data->crd[data->size - 1].x + 1);
+	mul.y = IMG_Y_SIZE / (data->crd[data->size - 1].y + 1);
+	crd2 = (t_2d_crd *)malloc(sizeof(t_2d_crd) * data->size);
 	i = 0;
 	while (i < data->size)
 	{
-		data->vec[i].x *= mul_x;
-		data->vec[i].y *= mul_y;
-		data->vec[i++].z *= mul_z;
+		crd2[i].x = data->crd[i].x * mul.x;
+		crd2[i].y = data->crd[i].y * mul.y;
+		i++;
 	}
+	return (crd2);
 }
 
-void	based_x(t_vector start, t_vector end, t_delta *diff, t_img *img)
+void	based_x(t_2d_crd start, t_2d_crd end, t_delta *diff, t_img *img)
 {
-	double	p;
+	int	p;
 	int	x;
 	int	y;
 	int	inc_x;
 	int	inc_y;
 
-	x = (int)start.x;
-	y = (int)start.y;
+	x = start.x;
+	y = start.y;
 	inc_x = 1;
 	if (start.x > end.x)
 		inc_x = -1;
@@ -67,14 +73,14 @@ void	based_x(t_vector start, t_vector end, t_delta *diff, t_img *img)
 	}
 }
 
-void	based_y(t_vector start, t_vector end, t_delta *diff, t_img *img)
+void	based_y(t_2d_crd start, t_2d_crd end, t_delta *diff, t_img *img)
 {
-	double	p;
+	int	p;
 	t_crd	crd;
 	t_crd	inc;
 
-	crd.x = (int)start.x;
-	crd.y = (int)start.y;
+	crd.x = start.x;
+	crd.y = start.y;
 	inc.x = 1;
 	if (start.x > end.x)
 		inc.x = -1;
@@ -82,7 +88,6 @@ void	based_y(t_vector start, t_vector end, t_delta *diff, t_img *img)
 	if (start.y > end.y)
 		inc.y = -1;
 	p = 2 * (diff->x - diff->y);//p의 초기값
-	printf("start.y, end.y, p : %f %f\n", start.y, end.y);
 	if (diff->x == 0)
 	{
 		while (start.y <= end.y ? crd.y <= end.y : crd.y >= end.y)
@@ -108,12 +113,12 @@ void	based_y(t_vector start, t_vector end, t_delta *diff, t_img *img)
 
 //맨처음 start점은 임의로 찍어주고 나머지 모든 점,선은 bresenham함수 반복으로 찍어줌.
 //start에 vec[0]넣어주고 나머지는 반복문으로 넣어줌
-void	bresenham(t_vector start, t_vector end, t_img *img)
+void	bresenham(t_2d_crd start, t_2d_crd end, t_img *img)
 {
 	t_delta	diff;
 
-	diff.x = end.x - start.x;
-	diff.y = end.y - start.y;
+	diff.x = abs(end.x - start.x);
+	diff.y = abs(end.y - start.y);
 	if (diff.x >= diff.y)
 		based_x(start, end, &diff, img);
 	else
@@ -142,23 +147,29 @@ void	print_pixel_in_vector(t_img *img, t_map *data)
 		6. i가 map->x * (map->y - 1)부터는 오른쪽과만 이어주기
 	*/
 	size_t i = 0;
-	t_vector	*vec;
+	t_2d_crd	*crd2;
 	t_map_len	*map;
 
-	multiplied_pixel(data);
-	vec = data->vec;
+	crd2 = multiplied_pixel(data);
+	printf("after\n");
+	for (int i = 0; i < data->size; i++)
+	{
+		printf("(%4d %4d)", crd2[i].x, crd2[i].y);
+		if (i % data->map->x == data->map->x - 1)
+			printf("\n");
+	}
 	map = data->map;
 	while (i < data->size - 1)
 	{
 		if (i < map->x * (map->y - 1))
-			bresenham(vec[i], vec[i + map->x], img);
+			bresenham(crd2[i], crd2[i + map->x], img);
 		if (i % map->x != map->x - 1)
-			bresenham(vec[i], vec[i + 1], img);
+			bresenham(crd2[i], crd2[i + 1], img);
 		i++;
 	}
 }
 
-void	print_map(t_map *iso_data)
+void	print_map(t_map *data)
 {
 	void *mlx;
 	void *mlx_win;
@@ -166,21 +177,20 @@ void	print_map(t_map *iso_data)
 
 	mlx = mlx_init();
 	mlx_win = mlx_new_window(mlx, MLX_X_SIZE, MLX_Y_SIZE, "Hello 42 Seoul");
-	img.img = mlx_new_image(mlx, IMG_X_SIZE + 500, IMG_Y_SIZE + 500);//1400 1200은 디파인 상수로 변경하기
+	img.img = mlx_new_image(mlx, IMG_X_SIZE + 200, IMG_Y_SIZE + 150);//1400 1200은 디파인 상수로 변경하기
 	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
-	print_pixel_in_vector(&img, iso_data);
+	print_pixel_in_vector(&img, data);
 	mlx_put_image_to_window(mlx, mlx_win, img.img, 150, 100);
 	mlx_loop(mlx);
 }
 
 int	main(int ac, char **av)
 {
-	t_map	*origin_data;
-	t_map	*iso_data;
+	t_map	*data;
 
-	origin_data = parsing_map(ac, av);
-	make_iso_vector(origin_data);
-	print_map(origin_data);
+	data = parsing_map(ac, av);
+	make_iso_vector(data);
+	print_map(data);
 	/*
 	3. 화면 출력(print_iso)
 		1. 일련의 과정 수행

@@ -37,15 +37,22 @@ t_crd	cross_vector(t_crd v1, t_crd v2)
 	return (crd);
 }
 
-void	rotate_unit_vector(t_unit new, t_crd *data)
+void	translation_vector(t_crd *crd, t_crd trans)
+{
+	crd->x -= trans.x;
+	crd->y -= trans.y;
+	crd->z -= trans.z;
+}
+
+void	rotate_unit_vector(t_unit new, t_crd *data_crd)
 {
 	t_crd	tmp;
 
-	tmp.x = data->x;
-	tmp.y = data->y;
-	tmp.z = data->z;
+	tmp.x = data_crd->x;
+	tmp.y = data_crd->y;
+	tmp.z = data_crd->z;
 
-	data->x = tmp.x * new.u.x + tmp.y * new.u.y + tmp.z * new.u.z;
-	data->y = tmp.x * new.v.x + tmp.y * new.v.y + tmp.z * new.v.z;
-	data->z = tmp.x * new.n.x + tmp.y * new.n.y + tmp.z * new.n.z;
+	data_crd->x = tmp.x * new.u.x + tmp.y * new.u.y + tmp.z * new.u.z;
+	data_crd->y = tmp.x * new.v.x + tmp.y * new.v.y + tmp.z * new.v.z;
+	data_crd->z = tmp.x * new.n.x + tmp.y * new.n.y + tmp.z * new.n.z;
 }

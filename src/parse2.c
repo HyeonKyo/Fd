@@ -1,16 +1,16 @@
 #include "fdf.h"
 
-t_vector	*make_vector(int **arr, t_map_len *map)
+t_crd	*make_coordinate(int **arr, t_map_len *map)
 {
-	t_vector	*vec;
+	t_crd	*crd;
 	int	len;
 	int	i;
 	int	idx_x;
 	int	idx_y;
 
 	len = map->x * map->y;
-	vec = (t_vector *)malloc(sizeof(t_vector) * len);
-	merror(vec);
+	crd = (t_crd *)malloc(sizeof(t_crd) * len);
+	merror(crd);
 	idx_y = -1;
 	i = 0;
 	while (++idx_y < map->y)
@@ -18,13 +18,13 @@ t_vector	*make_vector(int **arr, t_map_len *map)
 		idx_x = -1;
 		while (++idx_x < map->x)
 		{
-			vec[i].x = idx_x;
-			vec[i].y = idx_y;
-			vec[i++].z = arr[idx_y][idx_x];
+			crd[i].x = idx_x;
+			crd[i].y = idx_y;
+			crd[i++].z = arr[idx_y][idx_x];
 		}
 	}
 	clear_arr(arr, map);
-	return (vec);
+	return (crd);
 }
 
 t_map *parsing_map(int ac, char **av)
@@ -37,8 +37,8 @@ t_map *parsing_map(int ac, char **av)
 	line = 0;
 	data = create_data();
 	fd = check_input(ac, av);
-	arr = save_vector(fd, data->map);
-	data->vec = make_vector(arr, data->map);
+	arr = save_coordinate(fd, data->map);
+	data->crd = make_coordinate(arr, data->map);
 	data->size = data->map->x * data->map->y;
 	return (data);
 	//save vector

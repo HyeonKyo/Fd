@@ -43,7 +43,7 @@ void	fill_value(int **arr, char **buf, t_map_len *map)
 		arr[map->y][i] = ft_atoi(buf[i]);
 }
 
-int	**save_vector(int fd, t_map_len *map)
+int	**save_coordinate(int fd, t_map_len *map)
 {
 	char	*line;
 	char	**buf;
